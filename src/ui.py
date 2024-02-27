@@ -1,3 +1,5 @@
+import db_manager as dbops
+
 def menu_principal():
     print("\nBienvenido al Sistema de Gestión de la Farmacia")
     print("1. Gestión de Medicamentos")
@@ -20,6 +22,7 @@ def gestion_medicamentos():
 
         if opcion == '1':
             print("\nOpción Añadir Medicamento seleccionada.")
+            dbops.agregar_medicamento()
         elif opcion == '2':
             print("\nOpción Buscar Medicamento seleccionada.")
         elif opcion == '3':
