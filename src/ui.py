@@ -25,12 +25,17 @@ def gestion_medicamentos():
             dbops.agregar_medicamento()
         elif opcion == '2':
             print("\nOpción Buscar Medicamento seleccionada.")
+            search_value = input("Ingrese el nombre o ID del medicamento que desea buscar: ")
+            dbops.buscar_medicamento_por_nombre_o_id(search_value)
         elif opcion == '3':
             print("\nOpción Actualizar Medicamento seleccionada.")
+            dbops.actualizar_medicamento()
         elif opcion == '4':
             print("\nOpción Eliminar Medicamento seleccionada.")
+            dbops.eliminar_medicamento()
         elif opcion == '5':
             print("\nOpción Listar Medicamentos seleccionada.")
+            dbops.listar_medicamentos()
         elif opcion == '6':
             break
         else:
