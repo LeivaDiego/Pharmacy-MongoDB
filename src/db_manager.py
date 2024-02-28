@@ -445,7 +445,7 @@ def validar_entero(mensaje):
 
 def validar_fecha(mensaje):
     while True:
-        fecha_input = input(mensaje)
+        fecha_input = input(mensaje).strip()
         formatos_fecha = ["%Y-%m-%d", "%Y-%m", "%Y"]
         fecha = None
         
@@ -531,4 +531,37 @@ def filtrar_ventas():
             print("Finalizando listado de ventas.")
             break
 
+
 #--------------------------------------------- Operaciones con agregaciones ---------------------------------------------
+def total_ventas():
+    fecha, formato = validar_fecha("Ingresa el año para ver el total de ventas (YYYY): ")
+    año_usuario = fecha.year  # Extraer el año de la fecha
+    
+    # Convertir el año ingresado por el usuario en datetime para el filtro
+    inicio_año = datetime(año_usuario, 1, 1)
+    fin_año = datetime(año_usuario + 1, 1, 1)
+    
+    pipeline = [
+        {
+            "$match": {
+                "fecha_venta": {
+                    "$gte": inicio_año,
+                    "$lt": fin_año
+                }
+            }
+        },
+        {
+            "$group": {
+                "_id": None,  # Agrupar todos los documentos sin una clave específica
+                "total_ventas": {"$sum": "$total_venta"}
+            }
+        }
+    ]
+    
+    resultados = list(db.ventas.aggregate(pipeline))
+    
+    if resultados and resultados[0]['total_ventas'] > 0:
+        for resultado in resultados:
+            print(f"Total de ventas anuales del año {año_usuario}: Q {resultado['total_ventas']}")
+    else:
+        print(f"No se encontraron ventas para el año {año_usuario}.")

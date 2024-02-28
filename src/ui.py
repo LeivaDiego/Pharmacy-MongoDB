@@ -68,16 +68,17 @@ def gestion_ventas():
         else:
             print("\nOpción no válida. Por favor, intente de nuevo.")
 
-def reportes_analisis():
+def reportes_ventas():
     while True:
         print("\nReportes y Análisis")
-        print("1. Ventas por Periodo")
+        print("1. Total de Ventas por Año")
         print("2. Estado del Stock de Medicamentos")
         print("3. Regresar al Menú Principal")
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
-            print("Opción Ventas por Periodo seleccionada.")
+            print("Opción Total Ventas por Año seleccionada.")
+            dbops.total_ventas()
         elif opcion == '2':
             print("Opción Estado del Stock de Medicamentos seleccionada.")
         elif opcion == '3':
