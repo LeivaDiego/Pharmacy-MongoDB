@@ -443,7 +443,7 @@ def eliminar_venta():
         confirmacion = input("¿Estás seguro de que quieres eliminar esta venta? (s/n): ").strip().lower()
         if confirmacion == 's':
             # Eliminar la venta
-            db.ventas.delete_one({"_id": id_venta})
+            db.ventas.delete_one({"_id": ObjectId(id_venta)})
             print("Venta eliminada con éxito.")
             # Actualizar el stock de los medicamentos
             for item in venta["items"]:
