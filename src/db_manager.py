@@ -166,6 +166,28 @@ def buscar_medicamento(value):
         print("No se encontró el medicamento.")
         return None
     
+def actualizar_stock():
+    busqueda = input("Ingresa el ID o nombre del medicamento a actualizar el stock: ").strip()
+    medicamento = buscar_medicamento(busqueda)
+    
+    if not medicamento:
+        print("Medicamento no encontrado.")
+        return
+    
+    try:
+        cantidad_a_sumar = int(input(f"Cantidad de unidades a sumar al stock actual ({medicamento['stock']} unidades): "))
+        if cantidad_a_sumar < 0:
+            print("La cantidad a sumar debe ser un número positivo.")
+            return
+    except ValueError:
+        print("Por favor, ingresa un número válido.")
+        return
+    
+    nuevo_stock = medicamento['stock'] + cantidad_a_sumar
+    db.medicamentos.update_one({"_id": medicamento['_id']}, {"$set": {"stock": nuevo_stock}})
+    
+    print(f"Stock actualizado exitosamente. Nuevo stock de '{medicamento['nombre']}': {nuevo_stock} unidades.")
+
 
 def actualizar_medicamento():
     busqueda = input("Ingresa el ID o nombre del medicamento a actualizar: ").strip()
@@ -639,3 +661,30 @@ def top_categorias_vendidas():
             print(f"{i}. Clase: {categoria['_id']} | Total Ventas: {categoria['total_ventas']}")
     else:
         print(f"No se encontraron ventas para clases terapéuticas de medicamentos en el año {año_usuario}.")
+
+def medicamentos_bajo_stock():
+    pipeline = [
+        {
+            "$match": {
+                "stock": {"$lt": 10}  # Encuentra medicamentos con stock menor o igual a 10
+            }
+        },
+        {
+            "$project": {
+                "nombre": 1,
+                "stock": 1
+            }
+        },
+        {
+            "$sort": {"stock": 1}  # Ordena los resultados por stock ascendente
+        }
+    ]
+
+    resultados = list(db.medicamentos.aggregate(pipeline))
+
+    if resultados:
+        print("Medicamentos con bajo stock:")
+        for medicamento in resultados:
+            print(f"Nombre: {medicamento['nombre']}, Stock: {medicamento['stock']}")
+    else:
+        print("Todos los medicamentos tienen un stock adecuado. (arriba de 10)")

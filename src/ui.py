@@ -15,9 +15,10 @@ def gestion_medicamentos():
         print("1. Añadir Medicamento")
         print("2. Buscar Medicamento")
         print("3. Actualizar Medicamento")
-        print("4. Eliminar Medicamento")
-        print("5. Listar Medicamentos")
-        print("6. Regresar al Menú Principal")
+        print("4. Actualizar stock de medicamento")
+        print("5. Eliminar Medicamento")
+        print("6. Listar Medicamentos")
+        print("7. Regresar al Menú Principal")
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
@@ -31,12 +32,15 @@ def gestion_medicamentos():
             print("\nOpción Actualizar Medicamento seleccionada.")
             dbops.actualizar_medicamento()
         elif opcion == '4':
-            print("\nOpción Eliminar Medicamento seleccionada.")
-            dbops.eliminar_medicamento()
+            print("\nOpción Actualizar Stock seleccionada.")
+            dbops.actualizar_stock()
         elif opcion == '5':
-            print("\nOpción Listar Medicamentos seleccionada.")
+            print("\nOpción Eliminar Medicamento seleccionada.")
             dbops.listar_medicamentos()
         elif opcion == '6':
+            print("\nOpción Listar Medicamentos seleccionada.")
+            dbops.listar_medicamentos()
+        elif opcion == '7':
             break
         else:
             print("Opción no válida. Por favor, intente de nuevo.")
@@ -74,7 +78,8 @@ def reportes_analisis():
         print("1. Total de Ventas por Año")
         print("2. Top 10 medicamentos mas populares")
         print("3. Top 10 Clase de medicamentos mas rentables")
-        print("4. Regresar al Menú Principal")
+        print("4. Medicamentos con bajo stock")
+        print("5. Regresar al Menú Principal")
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
@@ -87,6 +92,9 @@ def reportes_analisis():
             print("Opción Top 10 medicamentos mas populares seleccionada.")
             dbops.top_categorias_vendidas()
         elif opcion == '4':
+            print("Opción Medicamentos con bajo Stock seleccionada.")
+            dbops.medicamentos_bajo_stock()
+        elif opcion == '5':
             break
         else:
             print("Opción no válida. Por favor, intente de nuevo.")
