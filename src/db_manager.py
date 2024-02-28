@@ -375,8 +375,8 @@ def registrar_venta():
    # Confirmación para proceder
     confirmacion = input("¿Estás seguro de que deseas registrar esta venta? (s/n): ").strip().lower()
     if confirmacion == 's':
-        db.ventas.insert_one(venta)
-        print("Venta registrada con éxito.")
+        resultado = db.ventas.insert_one(venta)
+        print(f"Venta registrada con éxito. ID de la venta: {resultado.inserted_id}")
     else:
         print("Venta cancelada.")
 
