@@ -274,22 +274,33 @@ def listar_medicamentos():
         ordenamiento = ASCENDING
     
     while continuar.lower() == 's':
-        # Realizar la consulta con ordenamiento, límite y salto (offset)
-        medicamentos = db.medicamentos.find().sort("stock", ordenamiento).skip(offset).limit(5)
+        medicamentos = db.medicamentos.find({}, {'nombre': 1, 'precio': 1, 'stock': 1}).sort("stock", ordenamiento).skip(offset).limit(5)
+        medicamentos_lista = list(medicamentos)  # Convertir el cursor a lista
+        contador = len(medicamentos_lista)  # Contar los elementos en la lista
+
+        if contador == 0:  # Si no hay documentos, indicar que no hay más para mostrar
+            if offset == 0:  # Si es la primera página y no hay documentos
+                print("No se encontraron medicamentos.")
+            else:
+                print("No hay más medicamentos para mostrar.")
+            break
 
         print("Listado de medicamentos:")
-        for medicamento in medicamentos:
-            print_doc(medicamento)  # Utilizando la función print_doc para mostrar cada medicamento
+        for medicamento in medicamentos_lista:
+            print_doc(medicamento)
             print('-'*40)
 
-        # Preguntar al usuario si desea ver los siguientes 5 medicamentos
+        if contador < 5:  # Si se recuperaron menos de 5 documentos, ya no hay más datos
+            print("Has llegado al final de la lista de medicamentos.")
+            break
+
         continuar = input("¿Deseas ver los siguientes 5 medicamentos? (s/n): ").strip()
-        
-        # Si el usuario desea continuar, incrementar el offset en 5
         if continuar.lower() == 's':
             offset += 5
         else:
             print("Finalizando listado de medicamentos.")
+            break
+
 
 
 #--------------------------------------------- Operaciones con ventas ---------------------------------------------
@@ -490,13 +501,34 @@ def filtrar_ventas():
         print("No se reconoció el ordenamiento. Mostrando resultados en orden ascendente por defecto.")
         ordenamiento = [(criterio, ASCENDING)]
 
-    contador = db.ventas.count_documents(filtro)
-    if contador == 0:
-        print(mensaje_no_encontrado)
-        return
+    offset = 0  # Iniciar el offset en 0
+    continuar = 's'  # Inicializar la variable para controlar el bucle
 
-    ventas = db.ventas.find(filtro).sort(ordenamiento).limit(5)
-    for venta in ventas:
-        print_doc(venta)
-        print('-'*40)
+    while continuar.lower() == 's':
+        ventas = db.ventas.find(filtro, {'_id': 1, 'fecha_venta': 1, 'total_venta': 1}).sort(ordenamiento).skip(offset).limit(5)
+        ventas_lista = list(ventas)  # Convertir el cursor a lista para poder contar los elementos sin consumir el cursor
+        contador = len(ventas_lista)  # Contar los elementos en la lista
 
+        if contador == 0:  # Si no hay documentos, ya sea en la primera página o después
+            if offset == 0:  # Si es la primera iteración y no hay documentos
+                print(mensaje_no_encontrado)
+            else:
+                print("No hay más ventas para mostrar.")
+            break
+
+        for venta in ventas_lista:
+            print_doc(venta)
+            print('-' * 40)
+
+        if contador < 5:  # Si se recuperaron menos de 5 documentos, significa que ya no hay más datos para mostrar después de esto
+            print("Has llegado al final de la lista de ventas.")
+            break
+
+        continuar = input("¿Deseas ver los siguientes 5 registros? (s/n): ").strip()
+        if continuar.lower() == 's':
+            offset += 5
+        else:
+            print("Finalizando listado de ventas.")
+            break
+
+#--------------------------------------------- Operaciones con agregaciones ---------------------------------------------
