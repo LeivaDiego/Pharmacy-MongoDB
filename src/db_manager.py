@@ -565,3 +565,37 @@ def total_ventas():
             print(f"Total de ventas anuales del año {año_usuario}: Q {resultado['total_ventas']}")
     else:
         print(f"No se encontraron ventas para el año {año_usuario}.")
+
+
+
+def top_productos_vendidos():
+    año_usuario = input("Ingresa el año para ver el top 10 de productos más vendidos (YYYY): ").strip()
+    try:
+        # Asegurar que el año es un entero
+        año_usuario = int(año_usuario)
+    except ValueError:
+        print("El año debe ser un número.")
+        return
+
+    inicio_año = datetime(año_usuario, 1, 1)
+    fin_año = datetime(año_usuario + 1, 1, 1)
+
+    pipeline = [
+        {"$match": {"fecha_venta": {"$gte": inicio_año, "$lt": fin_año}}},
+        {"$unwind": "$items"},
+        {"$group": {"_id": "$items.medicamento_id", "total_unidades_vendidas": {"$sum": "$items.cantidad"}}},
+        {"$sort": {"total_unidades_vendidas": -1}},
+        {"$limit": 10},
+        {"$lookup": {"from": "medicamentos", "localField": "_id", "foreignField": "_id", "as": "info_medicamento"}},
+        {"$unwind": "$info_medicamento"},
+        {"$project": {"nombre_producto": "$info_medicamento.nombre", "total_unidades_vendidas": 1, "_id": 0}}
+    ]
+
+    resultados = list(db.ventas.aggregate(pipeline))
+
+    if resultados:
+        print(f"Top 10 productos más vendidos en {año_usuario}:")
+        for i, resultado in enumerate(resultados, start=1):
+            print(f"{i}. {resultado['nombre_producto']}: {resultado['total_unidades_vendidas']} unidades")
+    else:
+        print(f"No se encontraron ventas de productos para el año {año_usuario}.")
