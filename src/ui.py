@@ -4,7 +4,7 @@ def menu_principal():
     print("\nBienvenido al Sistema de Gestión de la Farmacia")
     print("1. Gestión de Medicamentos")
     print("2. Gestión de Ventas")
-    print("3. Reportes y Análisis de Ventas")
+    print("3. Reportes y Análisis")
     print("4. Salir")
     opcion = input("Seleccione una opción: ")
     return opcion
@@ -68,12 +68,13 @@ def gestion_ventas():
         else:
             print("\nOpción no válida. Por favor, intente de nuevo.")
 
-def reportes_ventas():
+def reportes_analisis():
     while True:
-        print("\nReportes y Análisis de Venta")
+        print("\nReportes y Análisis")
         print("1. Total de Ventas por Año")
         print("2. Top 10 medicamentos mas populares")
-        print("3. Regresar al Menú Principal")
+        print("3. Top 10 Clase de medicamentos mas rentables")
+        print("4. Regresar al Menú Principal")
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
@@ -83,6 +84,9 @@ def reportes_ventas():
             print("Opción Top 10 medicamentos mas populares seleccionada.")
             dbops.top_productos_vendidos()
         elif opcion == '3':
+            print("Opción Top 10 medicamentos mas populares seleccionada.")
+            dbops.top_categorias_vendidas()
+        elif opcion == '4':
             break
         else:
             print("Opción no válida. Por favor, intente de nuevo.")

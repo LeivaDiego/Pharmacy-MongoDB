@@ -9,7 +9,7 @@ def main():
         elif opcion == '2':
             ui.gestion_ventas()
         elif opcion == '3':
-            ui.reportes_ventas()
+            ui.reportes_analisis()
         elif opcion == '4':
             print("Gracias por usar el Sistema de Gestión de la Farmacia. ¡Hasta pronto!")
             break

@@ -567,15 +567,9 @@ def total_ventas():
         print(f"No se encontraron ventas para el año {año_usuario}.")
 
 
-
 def top_productos_vendidos():
-    año_usuario = input("Ingresa el año para ver el top 10 de productos más vendidos (YYYY): ").strip()
-    try:
-        # Asegurar que el año es un entero
-        año_usuario = int(año_usuario)
-    except ValueError:
-        print("El año debe ser un número.")
-        return
+    fecha, formato = validar_fecha("Ingresa el año para ver el top 10 de productos más vendidos (YYYY): ")
+    año_usuario = fecha.year  # Extraer el año de la fecha
 
     inicio_año = datetime(año_usuario, 1, 1)
     fin_año = datetime(año_usuario + 1, 1, 1)
@@ -599,3 +593,49 @@ def top_productos_vendidos():
             print(f"{i}. {resultado['nombre_producto']}: {resultado['total_unidades_vendidas']} unidades")
     else:
         print(f"No se encontraron ventas de productos para el año {año_usuario}.")
+
+
+def top_categorias_vendidas():
+    fecha, formato = validar_fecha("Ingresa el año para ver el top 10 de clases más rentables (YYYY): ")
+    año_usuario = fecha.year  # Extraer el año de la fecha
+    
+    inicio_año = datetime(año_usuario, 1, 1)
+    fin_año = datetime(año_usuario + 1, 1, 1)
+
+    pipeline = [
+        {
+            "$match": {
+                "fecha_venta": {
+                    "$gte": inicio_año,
+                    "$lt": fin_año
+                }
+            }
+        },
+        { "$unwind": "$items" },
+        {
+            "$lookup": {
+                "from": "medicamentos",
+                "localField": "items.medicamento_id",
+                "foreignField": "_id",
+                "as": "info_medicamento"
+            }
+        },
+        { "$unwind": "$info_medicamento" },
+        {
+            "$group": {
+                "_id": "$info_medicamento.clase_terapeutica",
+                "total_ventas": { "$sum": "$items.subtotal" }
+            }
+        },
+        { "$sort": { "total_ventas": -1 } },
+        { "$limit": 10 }
+    ]
+
+    resultados = list(db.ventas.aggregate(pipeline))
+
+    if resultados:
+        print(f"Top 10 clases de medicamentos más rentables en el año {año_usuario}:")
+        for i, categoria in enumerate(resultados, start=1):
+            print(f"{i}. Clase: {categoria['_id']} | Total Ventas: {categoria['total_ventas']}")
+    else:
+        print(f"No se encontraron ventas para clases terapéuticas de medicamentos en el año {año_usuario}.")
