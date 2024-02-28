@@ -47,6 +47,7 @@ def solicitar_y_cargar_imagen():
         ruta_imagen = input("Ruta a la imagen del medicamento (deja en blanco si no quieres subir imagen, escribe 'cancelar' para detener el proceso): ").strip()
         # Reemplazar \ por /
         ruta_imagen = ruta_imagen.replace("\\", "/")
+        ruta_imagen = ruta_imagen.replace('"', '')
 
         if ruta_imagen.lower() == 'cancelar':
             print("Cancelando carga de imagen.")
@@ -166,6 +167,7 @@ def buscar_medicamento(value):
         print("No se encontró el medicamento.")
         return None
     
+
 def actualizar_stock():
     busqueda = input("Ingresa el ID o nombre del medicamento a actualizar el stock: ").strip()
     medicamento = buscar_medicamento(busqueda)
@@ -662,11 +664,12 @@ def top_categorias_vendidas():
     else:
         print(f"No se encontraron ventas para clases terapéuticas de medicamentos en el año {año_usuario}.")
 
+
 def medicamentos_bajo_stock():
     pipeline = [
         {
             "$match": {
-                "stock": {"$lt": 10}  # Encuentra medicamentos con stock menor o igual a 10
+                "stock": {"$lt": 5}  # Encuentra medicamentos con stock menor o igual a 5
             }
         },
         {
@@ -687,4 +690,4 @@ def medicamentos_bajo_stock():
         for medicamento in resultados:
             print(f"Nombre: {medicamento['nombre']}, Stock: {medicamento['stock']}")
     else:
-        print("Todos los medicamentos tienen un stock adecuado. (arriba de 10)")
+        print("Todos los medicamentos tienen un stock adecuado. (arriba de 5)")

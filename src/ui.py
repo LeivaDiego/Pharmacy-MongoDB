@@ -5,7 +5,8 @@ def menu_principal():
     print("1. Gestión de Medicamentos")
     print("2. Gestión de Ventas")
     print("3. Reportes y Análisis")
-    print("4. Salir")
+    print("4. Tablero Business Inteligence (mongo Charts)")
+    print("5. Salir")
     opcion = input("Seleccione una opción: ")
     return opcion
 
