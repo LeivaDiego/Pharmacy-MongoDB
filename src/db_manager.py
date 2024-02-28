@@ -1,5 +1,6 @@
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from gridfs import GridFS
+from datetime import datetime
 import os
 
 uri = "mongodb+srv://lei21752:pux2912@cluster.xjohdzx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster"
@@ -13,6 +14,7 @@ db = client.farmacia
 # Instanciar un GridFS
 fs = GridFS(db)
 
+#--------------------------------------------- Operaciones Auxiliares ---------------------------------------------
 def print_doc(document, indent=0):
     for key, value in document.items():
         print(' ' * indent + str(key) + ':', end=' ')
@@ -71,6 +73,7 @@ def solicitar_lista(mensaje):
     return items
 
 
+#--------------------------------------------- Operaciones con medicamentos --------------------------------------
 def agregar_medicamento():
     print("\nAgregar Nuevo Medicamento")
     
@@ -286,3 +289,84 @@ def listar_medicamentos():
             offset += 5
         else:
             print("Finalizando listado de medicamentos.")
+
+#--------------------------------------------- Operaciones con ventas ---------------------------------------------
+def solicitar_metodo_pago():
+    while True:
+        print("Seleccione el método de pago:")
+        print("1. Efectivo")
+        print("2. Tarjeta")
+        opcion = input("Ingrese el número correspondiente al método de pago: ").strip()
+        
+        if opcion == "1":
+            return "efectivo"
+        elif opcion == "2":
+            return "tarjeta"
+        else:
+            print("Opción no válida. Por favor, intente de nuevo.")
+
+def registrar_venta():
+    # Inicializar la venta
+    venta = {
+        "fecha_venta": datetime.now(),
+        "items": [],
+        "total_venta": 0,
+        "metodo_pago": ""
+    }
+
+    while True:
+        item = agregar_item_a_venta()
+        if item: # Asegurarse de que item no es None
+            venta["items"].append(item)  # Añadir el ítem a la lista de ítems de la venta
+
+        mas_items = input("¿Deseas agregar otro ítem a la venta? (s/n): ").strip().lower()
+        if mas_items != 's':
+            break
+
+    # Solicitar el método de pago
+    venta["metodo_pago"] = solicitar_metodo_pago()
+
+    # Calcular el total de la venta
+    venta["total_venta"] = sum(item["subtotal"] for item in venta["items"])
+
+    # Vista previa de la venta
+    print("La venta es:")
+    print_doc(venta)  # Mostrar la venta para fines de demostración
+
+
+   # Confirmación para proceder
+    confirmacion = input("¿Estás seguro de que deseas registrar esta venta? (s/n): ").strip().lower()
+    if confirmacion == 's':
+        db.ventas.insert_one(venta)
+        print("Venta registrada con éxito.")
+    else:
+        print("Venta cancelada.")
+
+def agregar_item_a_venta():
+
+    criterio = input("Ingrese el nombre o ID del medicamento que desea vender: ").strip()
+    medicamento = buscar_medicamento_por_nombre_o_id(criterio)
+
+    while True:
+        if medicamento:
+            cantidad = int(input(f"Ingrese la cantidad de {medicamento['nombre']} que desea vender: "))
+            if cantidad <= medicamento["stock"]:
+                precio_unitario = medicamento["precio"]
+                subtotal = cantidad * precio_unitario
+
+                # Actualizar el stock en la base de datos
+                nuevo_stock = medicamento["stock"] - cantidad
+                db.medicamentos.update_one({"_id": medicamento["_id"]}, {"$set": {"stock": nuevo_stock}})
+
+                print(f"{cantidad} unidades de {medicamento['nombre']} añadidas a la venta.")
+                return {
+                    "medicamento_id": medicamento["_id"],
+                    "cantidad": cantidad,
+                    "precio_unitario": precio_unitario,
+                    "subtotal": subtotal
+                }
+            else:
+                print("No hay suficiente stock para completar esta venta.")
+        else:
+            print("Medicamento no encontrado. Por favor, intente de nuevo.")
+

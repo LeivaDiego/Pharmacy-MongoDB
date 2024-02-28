@@ -52,6 +52,7 @@ def gestion_ventas():
 
         if opcion == '1':
             print("\nOpción Registrar Venta seleccionada.")
+            dbops.registrar_venta()
         elif opcion == '2':
             print("\nOpción Buscar Ventas seleccionada.")
         elif opcion == '3':
