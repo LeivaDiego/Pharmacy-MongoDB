@@ -1,4 +1,5 @@
 from pymongo import MongoClient, ASCENDING, DESCENDING
+from bson.objectid import ObjectId
 from gridfs import GridFS
 from datetime import datetime
 import os
@@ -144,7 +145,7 @@ def buscar_medicamento_por_nombre_o_id(value):
     
     try:
         # Intentar buscar por ObjectId
-        medicamento = db.medicamentos.find_one({"_id": criterio})
+        medicamento = db.medicamentos.find_one({"_id": ObjectId(criterio)})
     except:
         # Si falla, es probablemente porque no es un ObjectId válido, entonces buscamos por nombre
         pass
@@ -366,7 +367,42 @@ def agregar_item_a_venta():
                     "subtotal": subtotal
                 }
             else:
-                print("No hay suficiente stock para completar esta venta.")
+                print(f"No hay suficiente stock para completar esta venta.")
+                print(f"Stock disponible: {medicamento['stock']}")
         else:
             print("Medicamento no encontrado. Por favor, intente de nuevo.")
+
+def solicitar_id_venta():
+    id_venta = input("Por favor, ingresa el ID de la venta que deseas eliminar: ").strip()
+    return id_venta
+
+def eliminar_venta():
+    id_venta = input("Ingresa el ID (factura) de la venta a eliminar: ").strip()
+
+    # Buscar la venta por ID
+    try:
+        venta = db.ventas.find_one({"_id": ObjectId(id_venta)})
+    except:
+        pass
+
+    if venta:
+        print("Venta encontrada:")
+        print_doc(venta)
+
+        confirmacion = input("¿Estás seguro de que quieres eliminar esta venta? (s/n): ").strip().lower()
+        if confirmacion == 's':
+            # Eliminar la venta
+            db.ventas.delete_one({"_id": id_venta})
+            print("Venta eliminada con éxito.")
+            # Actualizar el stock de los medicamentos
+            for item in venta["items"]:
+                db.medicamentos.update_one(
+                    {"_id": item["medicamento_id"]},
+                    {"$inc": {"stock": item["cantidad"]}}
+                )
+            print("Stock de medicamentos actualizado.")
+        else:
+            print("Operación cancelada.")
+    else:
+        print("No se encontró la venta con el ID proporcionado.")
 

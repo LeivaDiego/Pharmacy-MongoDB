@@ -45,8 +45,8 @@ def gestion_ventas():
     while True:
         print("\nGestión de Ventas")
         print("1. Registrar Venta")
-        print("2. Buscar Ventas")
-        print("3. Listar Ventas")
+        print("2. Eliminar Ventas")
+        print("3. Filtrar Ventas")
         print("4. Regresar al Menú Principal")
         opcion = input("Seleccione una opción: ")
 
@@ -54,9 +54,10 @@ def gestion_ventas():
             print("\nOpción Registrar Venta seleccionada.")
             dbops.registrar_venta()
         elif opcion == '2':
-            print("\nOpción Buscar Ventas seleccionada.")
+            print("\nOpción Eliminar Ventas seleccionada.")
+            dbops.eliminar_venta()
         elif opcion == '3':
-            print("\nOpción Listar Ventas seleccionada.")
+            print("\nOpción Filtrar Ventas seleccionada.")
         elif opcion == '4':
             break
         else:
