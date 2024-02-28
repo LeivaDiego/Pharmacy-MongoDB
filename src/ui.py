@@ -37,7 +37,7 @@ def gestion_medicamentos():
             dbops.actualizar_stock()
         elif opcion == '5':
             print("\nOpción Eliminar Medicamento seleccionada.")
-            dbops.eliminar_medicamento()
+            dbops.eliminar_venta()
         elif opcion == '6':
             print("\nOpción Listar Medicamentos seleccionada.")
             dbops.listar_medicamentos()
