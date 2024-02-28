@@ -58,6 +58,7 @@ def gestion_ventas():
             dbops.eliminar_venta()
         elif opcion == '3':
             print("\nOpción Filtrar Ventas seleccionada.")
+            dbops.filtrar_ventas()
         elif opcion == '4':
             break
         else:

@@ -1,7 +1,7 @@
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from bson.objectid import ObjectId
 from gridfs import GridFS
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 uri = "mongodb+srv://lei21752:pux2912@cluster.xjohdzx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster"
@@ -406,3 +406,79 @@ def eliminar_venta():
     else:
         print("No se encontró la venta con el ID proporcionado.")
 
+def validar_entero(mensaje):
+    while True:
+        try:
+            valor = int(input(mensaje))
+            return valor
+        except ValueError:
+            print("Por favor, ingresa un número válido.")
+
+
+def validar_fecha(mensaje):
+    while True:
+        fecha_input = input(mensaje)
+        formatos_fecha = ["%Y-%m-%d", "%Y-%m", "%Y"]
+        fecha = None
+        
+        for formato in formatos_fecha:
+            try:
+                fecha = datetime.strptime(fecha_input, formato)
+                return fecha, formato
+            except ValueError:
+                continue  # Si no coincide, intentamos con el siguiente formato
+
+        # Si ninguno de los formatos coincide, se muestra un mensaje y se repite el bucle
+        print("Formato de fecha incorrecto. Usa YYYY.")
+
+
+def filtrar_ventas():
+    print("Opciones de ordenamiento:")
+    print("1. Monto total")
+    print("2. Cantidad de ítems")
+    print("3. Año de venta")
+    
+    filtro = {}
+    while True:
+        opcion = input("Elige el criterio de ordenamiento (1-3): ")
+        if opcion == "1":
+            criterio = "total_venta"
+            valor_filtro = validar_entero("Ingresa el monto de venta para filtrar: ")
+            filtro[criterio] = {"$gte": valor_filtro}
+            mensaje_no_encontrado = f"No se encontraron ventas para Monto total de {valor_filtro}"
+            break
+        elif opcion == "2":
+            criterio = "items.cantidad"
+            valor_filtro = validar_entero("Ingresa la cantidad mínima de ítems para filtrar: ")
+            filtro[criterio] = {"$gte": valor_filtro}
+            mensaje_no_encontrado = f"No se encontraron ventas por {valor_filtro} cantidad de ítems"
+            break
+        elif opcion == "3":
+            criterio = "fecha_venta"
+            fecha, formato = validar_fecha("Ingresa el año de venta para filtrar (YYYY): ")
+            inicio = fecha
+            fin = datetime(fecha.year + 1, 1, 1)
+            filtro["fecha_venta"] = {"$gte": inicio, "$lt": fin}
+            mensaje_no_encontrado = f"No se encontraron ventas para el año {fecha.year}"
+            break
+        else:
+            print("Opción no válida.")
+
+    orden = input("Escribe 'asc' para ascendente o 'desc' para descendente: ").strip().lower()
+    if orden == 'asc':
+        ordenamiento = [(criterio, ASCENDING)]
+    elif orden == 'desc':
+        ordenamiento = [(criterio, DESCENDING)]
+    else:
+        print("No se reconoció el ordenamiento. Mostrando resultados en orden ascendente por defecto.")
+        ordenamiento = [(criterio, ASCENDING)]
+
+    contador = db.ventas.count_documents(filtro)
+    if contador == 0:
+        print(mensaje_no_encontrado)
+        return
+
+    ventas = db.ventas.find(filtro).sort(ordenamiento).limit(5)
+    for venta in ventas:
+        print_doc(venta)
+        print('-'*40)
