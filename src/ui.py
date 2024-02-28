@@ -26,7 +26,7 @@ def gestion_medicamentos():
         elif opcion == '2':
             print("\nOpción Buscar Medicamento seleccionada.")
             search_value = input("Ingrese el nombre o ID del medicamento que desea buscar: ")
-            dbops.buscar_medicamento_por_nombre_o_id(search_value)
+            dbops.buscar_medicamento(search_value)
         elif opcion == '3':
             print("\nOpción Actualizar Medicamento seleccionada.")
             dbops.actualizar_medicamento()
@@ -47,7 +47,8 @@ def gestion_ventas():
         print("1. Registrar Venta")
         print("2. Eliminar Ventas")
         print("3. Filtrar Ventas")
-        print("4. Regresar al Menú Principal")
+        print("4. Buscar ventas")
+        print("5. Regresar al Menú Principal")
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
@@ -60,6 +61,9 @@ def gestion_ventas():
             print("\nOpción Filtrar Ventas seleccionada.")
             dbops.filtrar_ventas()
         elif opcion == '4':
+            print("\nOpción Buscar Ventas seleccionada.")
+            dbops.buscar_venta()
+        elif opcion == '5':
             break
         else:
             print("\nOpción no válida. Por favor, intente de nuevo.")

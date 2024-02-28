@@ -139,7 +139,7 @@ def agregar_medicamento():
     print(f"Medicamento agregado exitosamente con ID: {medicamento_id}")
 
 
-def buscar_medicamento_por_nombre_o_id(value):
+def buscar_medicamento(value):
     criterio = value
     medicamento = None
     
@@ -169,7 +169,7 @@ def buscar_medicamento_por_nombre_o_id(value):
 
 def actualizar_medicamento():
     busqueda = input("Ingresa el ID o nombre del medicamento a actualizar: ").strip()
-    medicamento = buscar_medicamento_por_nombre_o_id(busqueda)
+    medicamento = buscar_medicamento(busqueda)
     
     if not medicamento:
         return
@@ -243,7 +243,7 @@ def actualizar_medicamento():
 
 def eliminar_medicamento():
     busqueda = input("Ingresa el ID o nombre del medicamento a eliminar: ").strip()
-    medicamento = buscar_medicamento_por_nombre_o_id(busqueda)
+    medicamento = buscar_medicamento(busqueda)
     
     if not medicamento:
         return
@@ -291,6 +291,7 @@ def listar_medicamentos():
         else:
             print("Finalizando listado de medicamentos.")
 
+
 #--------------------------------------------- Operaciones con ventas ---------------------------------------------
 def solicitar_metodo_pago():
     while True:
@@ -305,6 +306,7 @@ def solicitar_metodo_pago():
             return "tarjeta"
         else:
             print("Opción no válida. Por favor, intente de nuevo.")
+
 
 def registrar_venta():
     # Inicializar la venta
@@ -343,10 +345,11 @@ def registrar_venta():
     else:
         print("Venta cancelada.")
 
+
 def agregar_item_a_venta():
 
     criterio = input("Ingrese el nombre o ID del medicamento que desea vender: ").strip()
-    medicamento = buscar_medicamento_por_nombre_o_id(criterio)
+    medicamento = buscar_medicamento(criterio)
 
     while True:
         if medicamento:
@@ -372,13 +375,26 @@ def agregar_item_a_venta():
         else:
             print("Medicamento no encontrado. Por favor, intente de nuevo.")
 
-def solicitar_id_venta():
-    id_venta = input("Por favor, ingresa el ID de la venta que deseas eliminar: ").strip()
-    return id_venta
+
+def buscar_venta():
+    id_venta = input("Ingresa el ID (factura) de la venta: ").strip()
+    venta = None
+    # Buscar la venta por ID
+    try:
+        venta = db.ventas.find_one({"_id": ObjectId(id_venta)})
+    except:
+        pass
+
+    if venta:
+        print("Venta encontrada:")
+        print_doc(venta)
+    else:
+        print("No se encontró la venta con el ID proporcionado.")
+
 
 def eliminar_venta():
     id_venta = input("Ingresa el ID (factura) de la venta a eliminar: ").strip()
-
+    venta = None
     # Buscar la venta por ID
     try:
         venta = db.ventas.find_one({"_id": ObjectId(id_venta)})
@@ -405,6 +421,7 @@ def eliminar_venta():
             print("Operación cancelada.")
     else:
         print("No se encontró la venta con el ID proporcionado.")
+
 
 def validar_entero(mensaje):
     while True:
@@ -482,3 +499,4 @@ def filtrar_ventas():
     for venta in ventas:
         print_doc(venta)
         print('-'*40)
+
